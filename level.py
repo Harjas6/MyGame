@@ -1,7 +1,11 @@
+import math
+
 import pygame
+import random
 from settings import *
 
-# Represents the level/ what will be seen on screen
+
+# Represents the level/what will be seen on screen
 class Level:
     # Initializes the display
     def __init__(self):
@@ -10,7 +14,7 @@ class Level:
         self.obstacle_sprites = pygame.sprite.Group()
         self.make_screen()
 
-# Does the intial printing of the level on the screen
+    # Does the intial printing of the level on the screen
     def make_screen(self):
         self.make_background()
         for row_num, row in enumerate(MAP):
@@ -18,23 +22,32 @@ class Level:
                 x = row_num * TILESIZE
                 y = col_num * TILESIZE
                 if item == 'p':
-                    self.player = Player((x, y), [self.visible_sprites],self.obstacle_sprites )
+                    self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites)
                 elif item == 's':
-                    Block((x,y), [self.visible_sprites,self.obstacle_sprites], name='spike'),
+                    Block((x, y), [self.visible_sprites, self.obstacle_sprites], name='spike')
 
-
-# Prints out the background
+    # Prints out the background
     def make_background(self):
-        for x in range(0, len(MAP)+1):
-            for y in range(0, len(MAP[0])+1):
-                    x_pos = x * TILESIZE
-                    y_pos = y * TILESIZE
-                    Block((x_pos, y_pos), [self.visible_sprites])
+        for x in range(0, len(MAP) + 1):
+            for y in range(0, len(MAP[0]) + 1):
+                x_pos = x * TILESIZE
+                y_pos = y * TILESIZE
+                Block((x_pos, y_pos), [self.visible_sprites])
 
-# Updates the screen with new locations of sprites
+    # Updates the screen with new locations of sprites
     def run(self):
+        self.generate_projectiles()
         self.visible_sprites.draw(self.disp_surf)
         self.visible_sprites.update()
+
+    def generate_projectiles(self):
+        possible_xy = [(random.randint(-50,0), random.randint(-50,HEIGHT+50)),
+                       (random.randint(WIDTH,WIDTH+50), random.randint(-50,HEIGHT+50)),
+                       (random.randint(-50,WIDTH+50), random.randint(-50,0)),
+                       (random.randint(-50,WIDTH+50), random.randint(HEIGHT,HEIGHT+50))]
+        xy = random.choice(possible_xy)
+        Projectile(xy, [self.visible_sprites, self.obstacle_sprites],self.player)
+
 
 
 class Block(pygame.sprite.Sprite):
@@ -46,7 +59,6 @@ class Block(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(topleft=pos)
         elif name == "spike":
             self.image = pygame.image.load('images/spike.png').convert_alpha()
-            #self.image = pygame.transform.scale(self.image, (50, 50))
             self.rect = self.image.get_rect(topleft=pos)
 
 
@@ -61,18 +73,18 @@ class Player(pygame.sprite.Sprite):
         self.obstacle_sprites = obstacles
         self.speed = 5
 
-# Updates player
+    # Updates player
     def update(self):
         self.input()
         self.move()
 
-# Handles input
+    # Handles input
     def input(self):
         keys = pygame.key.get_pressed()
         self.check_y_direct(keys)
         self.check_x_direct(keys)
 
-# Moves player with a normalized direction
+    # Moves player with a normalized direction
     def move(self):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
@@ -81,8 +93,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y * self.speed
         self.vert_collison()
 
-
-# Check if player is moving horizontal
+    # Check if player is moving horizontal
     def check_x_direct(self, keys):
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.direction.x = -1
@@ -100,6 +111,11 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.y = 0
 
+    # if there is collison with an obstacle return true
+    def is_collison(self):
+        for sprite in self.sprite.obstacles:
+            if sprite.rect.colliderect(self.rect):
+                return True
 
     # Handles horizontal collisons between the player and static objects
     def horiz_collison(self):
@@ -128,3 +144,34 @@ class Player(pygame.sprite.Sprite):
                         self.rect.left = sprite.rect.right
                     case 'right':
                         self.rect.right = sprite.rect.left
+
+
+class Projectile(pygame.sprite.Sprite):
+
+    def __init__(self, pos, groups,player):
+        super().__init__(groups)
+        self.image = pygame.image.load('images/orb.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft=pos)
+        direct = self.aim_at_player(player)
+        self.direction = pygame.math.Vector2(direct)
+        self.speed = 6
+
+    def update(self):
+        self.move()
+
+    def move(self):
+        self.rect.x += self.direction.x * self.speed
+        self.rect.y += self.direction.y * self.speed
+
+    def collide(self, player):
+        if self.rect.colliderect(player.rect):
+            print(True)
+
+    def aim_at_player(self, player):
+        player_x, player_y = player.rect.x, player.rect.y
+        direct = (player_x - self.rect.x, player_y - self.rect.y)
+        length = math.hypot(*direct)
+        return direct[0] / length, direct[1] / length
+
+
+
