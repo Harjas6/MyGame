@@ -12,6 +12,7 @@ class Level:
         self.disp_surf = pygame.display.get_surface()
         self.visible_sprites = pygame.sprite.Group()
         self.obstacle_sprites = pygame.sprite.Group()
+        self.projectile_sprites = pygame.sprite.Group()
         self.make_screen()
 
     # Does the intial printing of the level on the screen
@@ -37,8 +38,12 @@ class Level:
     # Updates the screen with new locations of sprites
     def run(self):
         self.generate_projectiles()
-        self.visible_sprites.draw(self.disp_surf)
         self.visible_sprites.update()
+        if self.player.is_collison():
+            return False
+        self.visible_sprites.draw(self.disp_surf)
+        return True
+
 
     def generate_projectiles(self):
         possible_xy = [(random.randint(-50,0), random.randint(-50,HEIGHT+50)),
@@ -46,8 +51,7 @@ class Level:
                        (random.randint(-50,WIDTH+50), random.randint(-50,0)),
                        (random.randint(-50,WIDTH+50), random.randint(HEIGHT,HEIGHT+50))]
         xy = random.choice(possible_xy)
-        Projectile(xy, [self.visible_sprites, self.obstacle_sprites],self.player)
-
+        Projectile(xy, [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],self.player)
 
 
 class Block(pygame.sprite.Sprite):
@@ -89,9 +93,9 @@ class Player(pygame.sprite.Sprite):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
         self.rect.x += self.direction.x * self.speed
-        self.horiz_collison()
         self.rect.y += self.direction.y * self.speed
-        self.vert_collison()
+        self.is_collison()
+
 
     # Check if player is moving horizontal
     def check_x_direct(self, keys):
@@ -113,38 +117,40 @@ class Player(pygame.sprite.Sprite):
 
     # if there is collison with an obstacle return true
     def is_collison(self):
-        for sprite in self.sprite.obstacles:
-            if sprite.rect.colliderect(self.rect):
-                return True
-
-    # Handles horizontal collisons between the player and static objects
-    def horiz_collison(self):
-        if self.direction.x > 0:
-            self.obstacle_loop('right')
-        elif self.direction.x < 0:
-            self.obstacle_loop('left')
-
-    # Handles vertical collisons between the player and static objects
-    def vert_collison(self):
-        if self.direction.y > 0:
-            self.obstacle_loop('down')
-        elif self.direction.y < 0:
-            self.obstacle_loop('up')
-
-    # if object collide with player puts player on correct side of object
-    def obstacle_loop(self, direc):
         for sprite in self.obstacle_sprites:
             if sprite.rect.colliderect(self.rect):
-                match direc:
-                    case 'down':
-                        self.rect.bottom = sprite.rect.top
-                    case 'up':
-                        self.rect.top = sprite.rect.bottom
-                    case 'left':
-                        self.rect.left = sprite.rect.right
-                    case 'right':
-                        self.rect.right = sprite.rect.left
+                return True
+        return False
 
+# !!! PROBABLY DO NOT NEED ANYMORE
+    # # Handles horizontal collisons between the player and static objects
+    # def horiz_collison(self):
+    #     if self.direction.x > 0:
+    #         self.obstacle_loop('right')
+    #     elif self.direction.x < 0:
+    #         self.obstacle_loop('left')
+    #
+    # # Handles vertical collisons between the player and static objects
+    # def vert_collison(self):
+    #     if self.direction.y > 0:
+    #         self.obstacle_loop('down')
+    #     elif self.direction.y < 0:
+    #         self.obstacle_loop('up')
+    #
+    # # if object collide with player puts player on correct side of object
+    # def obstacle_loop(self, direc):
+    #     for sprite in self.obstacle_sprites:
+    #         if sprite.rect.colliderect(self.rect):
+    #             match direc:
+    #                 case 'down':
+    #                     self.rect.bottom = sprite.rect.top
+    #                 case 'up':
+    #                     self.rect.top = sprite.rect.bottom
+    #                 case 'left':
+    #                     self.rect.left = sprite.rect.right
+    #                 case 'right':
+    #                     self.rect.right = sprite.rect.left
+    #
 
 class Projectile(pygame.sprite.Sprite):
 
