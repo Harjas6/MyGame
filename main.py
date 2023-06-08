@@ -1,4 +1,6 @@
 import sys
+import time
+
 import pygame
 from debugger import debug
 from settings import *
@@ -15,7 +17,8 @@ class Game:
         pygame.display.set_caption("TestGame")
         self.level = Level()
         self.timer = pygame.time.set_timer(pygame.USEREVENT, 1000)
-        self.score = 0
+        self.score = 1
+        self.leaderboard = []
 
     # Handles all the events within the games
     def run(self):
@@ -32,7 +35,7 @@ class Game:
                     self.score += 1
             if self.level.run():
                 self.draw_text(f"Score: {self.score}", (170, 50), (0, HEIGHT - 100),
-                               surface_color=(128, 191, 64), text_color=0, fade=False)
+                               background=(128, 191, 64), text_color=0, fade=False)
                 pygame.display.update()
                 self.clock.tick(FPS)
             else:
@@ -41,14 +44,29 @@ class Game:
                     self.level = Level()
 
     def play_again(self):
+        self.leaderboard_sorting()
         while True:
-            self.draw_text("GAME OVER, Press R to play again", (WIDTH, 350), (0, 200))
+            self.draw_text("GAME OVER, Press R to play again", (WIDTH, 250), (0, 0))
+            self.draw_text("LEADERBOARD", (WIDTH / 3, 50), (WIDTH / 3, 250),
+                           text_color='black', background='White')
+            self.print_leaderboard()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 elif pygame.key.get_pressed()[pygame.K_r]:
                     return True
+
+    def print_leaderboard(self):
+        for index, score in enumerate(self.leaderboard):
+            self.draw_text(f"{index + 1}: {score} seconds", (WIDTH/3, 50),(WIDTH/3, 250 + (index+1) * 50),
+                           text_color='black', background='White')
+
+    def leaderboard_sorting(self):
+        self.leaderboard.append(self.score)
+        self.leaderboard.sort()
+        self.leaderboard.reverse()
+        del self.leaderboard[10:]
 
     def start_screen(self):
         while True:
@@ -65,10 +83,10 @@ class Game:
             pygame.display.update()
 
     def draw_text(self, string, background_size, screen_pos, text_color=(255, 255, 255), font_size=30,
-                  font='Arial', bolded=False, surface_color=(200, 0, 50), fade=True):
+                  font='Arial', bolded=False, background=(200, 0, 50), fade=True):
 
         text_holder = pygame.Surface(background_size)
-        text_holder.fill(surface_color)
+        text_holder.fill(background)
         if fade:
             text_holder.set_alpha(12)
         center = text_holder.get_size()

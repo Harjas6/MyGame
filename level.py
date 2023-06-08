@@ -29,6 +29,8 @@ class Level:
                 elif item == 's':
                     Block((x, y), [self.visible_sprites, self.obstacle_sprites], name='spike')
 
+
+
     # Prints out the background
     def make_background(self):
         for x in range(0, len(MAP) + 1):
@@ -48,7 +50,7 @@ class Level:
         return True
 
     def generate_projectiles(self):
-        if pygame.time.get_ticks() - self.time_passed > 1000:
+        if pygame.time.get_ticks() - self.time_passed > 1200:
             self.time_passed = pygame.time.get_ticks()
             positions = [(randint(-50, 0), randint(-50, HEIGHT + 50)),
                          (randint(WIDTH, WIDTH + 50), randint(-50, HEIGHT + 50)),
@@ -92,7 +94,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.direction = pygame.math.Vector2()
         self.obstacle_sprites = obstacles
-        self.speed = 5
+        self.speed = 7
 
     # Updates player
     def update(self):
@@ -111,6 +113,10 @@ class Player(pygame.sprite.Sprite):
             self.direction = self.direction.normalize()
         self.rect.x += self.direction.x * self.speed
         self.rect.y += self.direction.y * self.speed
+        if self.rect.x > WIDTH - self.image.get_size()[0] or self.rect.x < 0:
+            self.rect.x -= self.direction.x * self.speed
+        if self.rect.y > HEIGHT - self.image.get_size()[1] or self.rect.y < 0:
+            self.rect.y -= self.direction.y * self.speed
         self.is_collison()
 
     # Check if player is moving horizontal
@@ -177,7 +183,7 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         direct = self.aim_at_player(player)
         self.direction = pygame.math.Vector2(direct)
-        self.speed = 6
+        self.speed = choice([3,5,4,6])
 
     def update(self):
         self.move()
