@@ -23,6 +23,8 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif pygame.key.get_pressed()[pygame.K_h]:
+                    self.start_screen()
             if self.level.run():
                 pygame.display.update()
                 self.clock.tick(FPS)
@@ -33,12 +35,12 @@ class Game:
 
     def play_again(self):
         while True:
-            self.draw_text('GAME OVER, Press any key to play again', (255, 255, 255),(WIDTH, 50), (0,HEIGHT-50))
+            self.draw_text('GAME OVER, Press r to play again', (255, 255, 255),(WIDTH, 50), (0,HEIGHT-50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN:
+                elif pygame.key.get_pressed()[pygame.K_r]:
                     return True
 
     def draw_text(self, text, color, size, pos):
@@ -54,13 +56,13 @@ class Game:
         while True:
             self.draw_text("Use W, A, S, D or the arrow keys to move", (255,255,255), (WIDTH,50), (0, 0))
             self.draw_text("Dodge the spikes and orange orbs", (255,255,255), (WIDTH,50), (0, 50))
-            self.draw_text("Press any key to continue", (255,255,255), (WIDTH,50), (0, 100))
-
+            self.draw_text("Press h for this to show up again", (255,255,255), (WIDTH,50), (0, 100))
+            self.draw_text("Press enter/return to continue", (255,255,255), (WIDTH,50), (0, 150))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN:
+                elif pygame.key.get_pressed()[pygame.K_RETURN]:
                     return
             pygame.display.update()
 

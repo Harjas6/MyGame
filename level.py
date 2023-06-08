@@ -14,6 +14,7 @@ class Level:
         self.obstacle_sprites = pygame.sprite.Group()
         self.projectile_sprites = pygame.sprite.Group()
         self.make_screen()
+        self.time_passed = pygame.time.get_ticks()
 
     # Does the intial printing of the level on the screen
     def make_screen(self):
@@ -44,14 +45,18 @@ class Level:
         self.visible_sprites.draw(self.disp_surf)
         return True
 
-
     def generate_projectiles(self):
-        possible_xy = [(random.randint(-50,0), random.randint(-50,HEIGHT+50)),
-                       (random.randint(WIDTH,WIDTH+50), random.randint(-50,HEIGHT+50)),
-                       (random.randint(-50,WIDTH+50), random.randint(-50,0)),
-                       (random.randint(-50,WIDTH+50), random.randint(HEIGHT,HEIGHT+50))]
-        xy = random.choice(possible_xy)
-        Projectile(xy, [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],self.player)
+        if pygame.time.get_ticks() - self.time_passed > 1000:
+            self.time_passed = pygame.time.get_ticks()
+            xy = [(random.randint(-50, 0), random.randint(-50, HEIGHT + 50)),
+                           (random.randint(WIDTH, WIDTH + 50), random.randint(-50, HEIGHT + 50)),
+                           (random.randint(-50, WIDTH + 50), random.randint(-50, 0)),
+                           (random.randint(-50, WIDTH + 50), random.randint(HEIGHT, HEIGHT + 50))]
+            #xy = random.choice(possible_xy)
+            Projectile(xy[0], [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites], self.player)
+            Projectile(xy[1], [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites], self.player)
+            Projectile(xy[2], [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites], self.player)
+            Projectile(xy[3], [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites], self.player)
 
 
 class Block(pygame.sprite.Sprite):
@@ -96,7 +101,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y * self.speed
         self.is_collison()
 
-
     # Check if player is moving horizontal
     def check_x_direct(self, keys):
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
@@ -122,39 +126,40 @@ class Player(pygame.sprite.Sprite):
                 return True
         return False
 
+
 # !!! PROBABLY DO NOT NEED ANYMORE
-    # # Handles horizontal collisons between the player and static objects
-    # def horiz_collison(self):
-    #     if self.direction.x > 0:
-    #         self.obstacle_loop('right')
-    #     elif self.direction.x < 0:
-    #         self.obstacle_loop('left')
-    #
-    # # Handles vertical collisons between the player and static objects
-    # def vert_collison(self):
-    #     if self.direction.y > 0:
-    #         self.obstacle_loop('down')
-    #     elif self.direction.y < 0:
-    #         self.obstacle_loop('up')
-    #
-    # # if object collide with player puts player on correct side of object
-    # def obstacle_loop(self, direc):
-    #     for sprite in self.obstacle_sprites:
-    #         if sprite.rect.colliderect(self.rect):
-    #             match direc:
-    #                 case 'down':
-    #                     self.rect.bottom = sprite.rect.top
-    #                 case 'up':
-    #                     self.rect.top = sprite.rect.bottom
-    #                 case 'left':
-    #                     self.rect.left = sprite.rect.right
-    #                 case 'right':
-    #                     self.rect.right = sprite.rect.left
-    #
+# # Handles horizontal collisons between the player and static objects
+# def horiz_collison(self):
+#     if self.direction.x > 0:
+#         self.obstacle_loop('right')
+#     elif self.direction.x < 0:
+#         self.obstacle_loop('left')
+#
+# # Handles vertical collisons between the player and static objects
+# def vert_collison(self):
+#     if self.direction.y > 0:
+#         self.obstacle_loop('down')
+#     elif self.direction.y < 0:
+#         self.obstacle_loop('up')
+#
+# # if object collide with player puts player on correct side of object
+# def obstacle_loop(self, direc):
+#     for sprite in self.obstacle_sprites:
+#         if sprite.rect.colliderect(self.rect):
+#             match direc:
+#                 case 'down':
+#                     self.rect.bottom = sprite.rect.top
+#                 case 'up':
+#                     self.rect.top = sprite.rect.bottom
+#                 case 'left':
+#                     self.rect.left = sprite.rect.right
+#                 case 'right':
+#                     self.rect.right = sprite.rect.left
+#
 
 class Projectile(pygame.sprite.Sprite):
 
-    def __init__(self, pos, groups,player):
+    def __init__(self, pos, groups, player):
         super().__init__(groups)
         self.image = pygame.image.load('images/orb.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -178,6 +183,3 @@ class Projectile(pygame.sprite.Sprite):
         direct = (player_x - self.rect.x, player_y - self.rect.y)
         length = math.hypot(*direct)
         return direct[0] / length, direct[1] / length
-
-
-
