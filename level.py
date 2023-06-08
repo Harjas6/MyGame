@@ -1,7 +1,8 @@
 import math
-
 import pygame
-import random
+import time
+
+from random import choice, randint
 from settings import *
 
 
@@ -42,33 +43,33 @@ class Level:
         self.generate_projectiles()
         self.visible_sprites.update()
         if self.player.is_collison():
-            return True
+            return False
         self.visible_sprites.draw(self.disp_surf)
         return True
 
     def generate_projectiles(self):
         if pygame.time.get_ticks() - self.time_passed > 1000:
             self.time_passed = pygame.time.get_ticks()
-            positions = [(random.randint(-50, 0), random.randint(-50, HEIGHT + 50)),
-                         (random.randint(WIDTH, WIDTH + 50), random.randint(-50, HEIGHT + 50)),
-                         (random.randint(-50, WIDTH + 50), random.randint(-50, 0)),
-                         (random.randint(-50, WIDTH + 50), random.randint(HEIGHT, HEIGHT + 50))]
-            Projectile(random.choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
+            positions = [(randint(-50, 0), randint(-50, HEIGHT + 50)),
+                         (randint(WIDTH, WIDTH + 50), randint(-50, HEIGHT + 50)),
+                         (randint(-50, WIDTH + 50), randint(-50, 0)),
+                         (randint(-50, WIDTH + 50), randint(HEIGHT, HEIGHT + 50))]
+            Projectile(choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
                        self.player)
-            Projectile(random.choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
+            Projectile(choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
                        self.player)
-            Projectile(random.choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
+            Projectile(choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
                        self.player)
 
     def discard_projectiles(self):
         for projectile in self.projectile_sprites:
             if self.projectile_offscreen(projectile):
                 self.projectile_sprites.remove(projectile)
+                
 
     def projectile_offscreen(self, projectile):
         return projectile.rect.x > (WIDTH + 100) or projectile.rect.x < -100 or \
             projectile.rect.y > (HEIGHT + 100) or projectile.rect.y < 100
-
 
 class Block(pygame.sprite.Sprite):
     # Creates a block and places it in a group
@@ -194,3 +195,5 @@ class Projectile(pygame.sprite.Sprite):
         direct = (player_x - self.rect.x, player_y - self.rect.y)
         length = math.hypot(*direct)
         return direct[0] / length, direct[1] / length
+
+
