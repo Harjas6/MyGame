@@ -4,6 +4,7 @@ from debugger import debug
 from settings import *
 from level import Level
 
+
 # Represents overall game
 class Game:
     # Initializes pygame, clock, window, and level
@@ -14,7 +15,7 @@ class Game:
         pygame.display.set_caption("TestGame")
         self.level = Level()
 
-# Handles all the events within the games
+    # Handles all the events within the games
     def run(self):
         self.level.run()
         self.start_screen()
@@ -32,10 +33,9 @@ class Game:
                 if self.play_again():
                     self.level = Level()
 
-
     def play_again(self):
         while True:
-            self.draw_text('GAME OVER, Press r to play again', (255, 255, 255),(WIDTH, 50), (0,HEIGHT-50))
+            self.draw_text('GAME OVER, Press r to play again', (255, 255, 255), (WIDTH, 50), (0, HEIGHT - 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -54,10 +54,10 @@ class Game:
 
     def start_screen(self):
         while True:
-            self.draw_text("Use W, A, S, D or the arrow keys to move", (255,255,255), (WIDTH,50), (0, 0))
-            self.draw_text("Dodge the spikes and orange orbs", (255,255,255), (WIDTH,50), (0, 50))
-            self.draw_text("Press h for this to show up again", (255,255,255), (WIDTH,50), (0, 100))
-            self.draw_text("Press enter/return to continue", (255,255,255), (WIDTH,50), (0, 150))
+            self.draw_text("Use W, A, S, D or the arrow keys to move", (255, 255, 255), (WIDTH, 50), (0, 0))
+            self.draw_text("Dodge the spikes and orange orbs", (255, 255, 255), (WIDTH, 50), (0, 50))
+            self.draw_text("Press h for this to show up again", (255, 255, 255), (WIDTH, 50), (0, 100))
+            self.draw_text("Press enter/return to continue", (255, 255, 255), (WIDTH, 50), (0, 150))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -65,6 +65,7 @@ class Game:
                 elif pygame.key.get_pressed()[pygame.K_RETURN]:
                     return
             pygame.display.update()
+
 
 if __name__ == '__main__':
     game = Game()
