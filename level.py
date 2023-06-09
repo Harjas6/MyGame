@@ -21,6 +21,7 @@ class Level:
     def make_screen(self):
 
         self.make_background()
+        # Goes through map placing player and obstacles where needed
         for row_num, row in enumerate(self.map):
             for col_num, item in enumerate(row):
                 x = row_num * TILESIZE
@@ -52,10 +53,12 @@ class Level:
     def generate_projectiles(self):
         if pygame.time.get_ticks() - self.time_passed > 1200:
             self.time_passed = pygame.time.get_ticks()
+            # 3 random x and y positions slightly offscreen
             positions = [(randint(-50, 0), randint(-50, HEIGHT + 50)),
                          (randint(WIDTH, WIDTH + 50), randint(-50, HEIGHT + 50)),
                          (randint(-50, WIDTH + 50), randint(-50, 0)),
                          (randint(-50, WIDTH + 50), randint(HEIGHT, HEIGHT + 50))]
+            # 3 projectiles created choosing one of the possible positions
             Projectile(choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
                        self.player)
             Projectile(choice(positions), [self.visible_sprites, self.projectile_sprites, self.obstacle_sprites],
@@ -113,8 +116,10 @@ class Player(pygame.sprite.Sprite):
     def move(self):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+        # Changes player position
         self.rect.x += self.direction.x * self.speed
         self.rect.y += self.direction.y * self.speed
+        # IF new position is offscreen, undos above change keeping player on screen
         if self.rect.x > WIDTH - self.image.get_size()[0] or self.rect.x < 0:
             self.rect.x -= self.direction.x * self.speed
         if self.rect.y > HEIGHT - self.image.get_size()[1] or self.rect.y < 0:

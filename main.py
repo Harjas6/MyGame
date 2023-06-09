@@ -5,7 +5,7 @@ from level import Level
 
 # Represents overall game
 class Game:
-    # Initializes pygame, clock, window, and level
+    # Initializes pygame, clock, window, and other features needed
     def __init__(self):
         pygame.init()
         self.clock = pygame.time.Clock()
@@ -20,6 +20,7 @@ class Game:
     def run(self):
         self.level.run()
         self.start_screen()
+        # Checks if buttons are pressed
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -29,6 +30,7 @@ class Game:
                     self.start_screen()
                 elif event.type == pygame.USEREVENT:
                     self.score += 1
+            # This runs as long as player doesn't die
             if self.level.run():
                 self.draw_text(f"Score: {self.score}", (170, 50), (0, HEIGHT - 100),
                                background=(128, 191, 64), text_color=0, fade=False)
@@ -39,6 +41,7 @@ class Game:
                     self.score = 0
                     self.level = Level()
 
+    # Puts graphics asking user to play again and updates leaderboard stats
     def play_again(self):
         self.leaderboard_sorting()
         while True:
@@ -46,6 +49,7 @@ class Game:
             self.draw_text("LEADERBOARD", (WIDTH / 3, 50), (WIDTH / 3, 250),
                            text_color='black', background='White')
             self.print_leaderboard()
+            # CHecks user input
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -58,12 +62,14 @@ class Game:
             self.draw_text(f"{index + 1}: {score} seconds", (WIDTH/3, 50),(WIDTH/3, 250 + (index+1) * 50),
                            text_color='black', background='White')
 
+    # Adds score to leaderboard and sorts/deletes to make sure top 10 scores are displayed
     def leaderboard_sorting(self):
         self.leaderboard.append(self.score)
         self.leaderboard.sort()
         self.leaderboard.reverse()
         del self.leaderboard[10:]
 
+    # Prints graphics for start screen
     def start_screen(self):
         while True:
             self.draw_text("Use W, A, S, D or the arrow keys to move", (WIDTH, 50), (0, 0))
@@ -78,6 +84,7 @@ class Game:
                     return
             pygame.display.update()
 
+    # Draws text according to parameters passed
     def draw_text(self, string, background_size, screen_pos, text_color=(255, 255, 255), font_size=30,
                   font='Arial', bolded=False, background=(200, 0, 50), fade=True):
 
