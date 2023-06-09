@@ -1,11 +1,7 @@
 import sys
-import time
-
 import pygame
-from debugger import debug
 from settings import *
 from level import Level
-
 
 # Represents overall game
 class Game:
@@ -100,7 +96,6 @@ class Game:
 
         self.screen.blit(text_holder, screen_pos)
         pygame.display.update()
-
 
 if __name__ == '__main__':
     game = Game()

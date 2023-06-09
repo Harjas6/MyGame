@@ -1,5 +1,6 @@
-## My 2D Game
+## Controls
 
-Simple 2D game made in pygame to help me better understand how pyGame
-works as well as helping me learn how to abstract different ideas
-into code
+- W,A,S,D or arrow keys to move
+- H to pop up instructions if you forget
+
+**The goal is to dodge the spikes and the orbs for as long as possible**
