@@ -10,7 +10,7 @@ class Game:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("TestGame")
+        pygame.display.set_caption("Bullet Storm")
         self.level = Level()
         self.timer = pygame.time.set_timer(pygame.USEREVENT, 1000)
         self.score = 1
